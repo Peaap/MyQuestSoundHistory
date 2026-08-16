@@ -1,8 +1,8 @@
-MyQuestSoundHistory
+# MyQuestSoundHistory
 A World of Warcraft addon that plays sound alerts for quest events and maintains a quest history.
 
-Features
-Main Features:
+##Features
+###Main Features:
 Sound notifications when accepting quests
 
 Database of accepted quests with detailed information
@@ -11,12 +11,12 @@ Display of quest rewards with icons and tooltips
 
 Quest history tracked separately for each character
 
-Commands
+### Commands
 /MQSH - Open addon settings
 
 /MQSHC - Clear quest history database (removes all saved quests; temporarily added)
 
-Interface
+### Interface
 A "History" button appears in the quest log, opening a window with:
 
 A list of all accepted quests (left side)
@@ -29,7 +29,7 @@ Quest objectives (text + item icons)
 
 Rewards (with icons)
 
-Settings
+## Settings
 Settings can be accessed via the /MQSH command or through the interface menu:
 
 Toggle sound notifications on/off
@@ -43,9 +43,9 @@ Select sounds for various quest events
 The addon is currently available in Russian only.
 Work is underway to adapt and modify the addon to support the English
 
-Version
+## Version
 Current version: 1.0 beta.1
 
-Author
+## Author
 
 MottiDowerro 
