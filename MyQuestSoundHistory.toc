@@ -1,0 +1,18 @@
+## Interface: 30300
+## Title: |cffC78FEA|cffD19DE2|cffDBAAEAMy|r|cffC78FEAQ|r|cffB471F2u|r|cffA053F6e|r|cff8C35FAst|r|cff7817FFSound|r|cff6400FFHistory|r
+## Author: MottiDowerro
+## Notes: Announce sounds when questing and quest history /MQSH. English adaptation by Peaap
+## Version: 1.0 beta.1
+
+## SavedVariables: MQSH_Config MQSH_QuestDB
+## SavedVariablesPerCharacter: MQSH_Char_HistoryDB
+
+Locales.lua
+Settings.lua
+Core.lua
+modules\ScrollBarUtils.lua
+modules\SoundAnouncer.lua
+modules\QuestDataBaseController.lua
+modules\QuestDetails.lua
+modules\QuestList.lua
+modules\QuestOverlay.lua
