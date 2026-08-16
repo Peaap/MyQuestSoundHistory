@@ -1,44 +1,51 @@
-# MyQuestSoundHistory
+MyQuestSoundHistory
+A World of Warcraft addon that plays sound alerts for quest events and maintains a quest history.
 
-Аддон для World of Warcraft, который объявляет звуки при выполнении квестов и ведет историю квестов.
+Features
+Main Features:
+Sound notifications when accepting quests
 
-## Функциональность
+Database of accepted quests with detailed information
 
-### Основные возможности:
-- Звуковые уведомления при принятии квестов
-- База данных принятых квестов с детальной информацией
-- Отображение наград квестов с иконками и тултипами
-- История квестов у каждого отдельного персонажа
+Display of quest rewards with icons and tooltips
 
-### Команды
+Quest history tracked separately for each character
 
-- `/MQSH` - Открыть настройки аддона
-- `/MQSHC` - Очистить базу данных истории квестов (удаляет все сохраненные квесты, добавлена временно)
+Commands
+/MQSH - Open addon settings
 
-### Интерфейс
+/MQSHC - Clear quest history database (removes all saved quests; temporarily added)
 
-В журнале квестов появляется кнопка "История", которая открывает окно с:
-- Списком всех принятых квестов (слева)
-- Детальной информацией о выбранном квесте (справа):
-  - Описание квеста
-  - Цели квеста (текст + иконки предметов)
-  - Награды (с иконками)
+Interface
+A "History" button appears in the quest log, opening a window with:
 
-## Настройки
+A list of all accepted quests (left side)
 
-Настройки доступны через команду `/MQSH` или через меню интерфейса:
-- Включение/отключение звуковых уведомлений
-- Включение/отключение истории квестов
-- Выбор звуков для различных событий квестов
+Detailed information about the selected quest (right side):
 
-## Локализация
+Quest description
 
-Аддон работает только на русском языке.
+Quest objectives (text + item icons)
 
-## Версия
+Rewards (with icons)
 
-Текущая версия: 1.0 beta.1
+Settings
+Settings can be accessed via the /MQSH command or through the interface menu:
 
-## Автор
+Toggle sound notifications on/off
+
+Toggle quest history on/off
+
+Select sounds for various quest events
+
+## Localization & Future Development
+
+The addon is currently available in Russian only.
+Work is underway to adapt and modify the addon to support the English
+
+Version
+Current version: 1.0 beta.1
+
+Author
 
 MottiDowerro 
