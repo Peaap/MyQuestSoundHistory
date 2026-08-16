@@ -1,21 +1,21 @@
+local L = _G.MQSH_L
 local QuestList = {}
 
--- Вспомогательные переменные (будут передаваться через параметры или инициализироваться снаружи)
+-- Helper variables (initialized externally via InitVars)
 local leftContent, leftScrollFrame, leftScrollbar
 local selectedButton
 local BUTTON_HEIGHT, BUTTON_TEXT_PADDING_X, BUTTON_TEXT_PADDING_Y, BUTTON_SPACING
 local scrollPairs
 
--- Переменные для сортировки
-local sortType = "level" -- "level", "title", "id", "date"
-local sortOrder = "asc" -- "asc" для возрастания, "desc" для убывания
+-- Sort variables
+local sortType = "level"
+local sortOrder = "asc"
 
--- Переменные для группировки
+-- Grouping variables
 local SECTION_HEADER_PADDING = 1
-local SECTION_SPACING = 1    -- Минимальное расстояние между секциями
-local collapsedSections = {} -- Хранит состояние свернутых разделов
+local SECTION_SPACING = 1
+local collapsedSections = {}
 
--- Функции для инициализации переменных
 function QuestList.InitVars(vars)
     leftContent = vars.leftContent
     leftScrollFrame = vars.leftScrollFrame
@@ -28,13 +28,11 @@ function QuestList.InitVars(vars)
     scrollPairs = vars.scrollPairs
 end
 
--- Функция для установки параметров сортировки
 function QuestList.SetSortParams(type, order)
     sortType = type or "level"
     sortOrder = order or "asc"
 end
 
--- Новые функции для получения текущих параметров сортировки
 function QuestList.GetSortType()
     return sortType
 end
@@ -43,12 +41,11 @@ function QuestList.GetSortOrder()
     return sortOrder
 end
 
--- Функция для создания заголовка раздела
+-- Section header creation
 QuestList.CreateSectionHeader = function(sectionName, isCollapsed)
     local header = CreateFrame("Button", nil, leftContent)
     header:SetHeight(BUTTON_HEIGHT)
     
-    -- Кнопка сворачивания/разворачивания (слева)
     header.toggleBtn = CreateFrame("Button", nil, header)
     header.toggleBtn:SetSize(16, 16)
     header.toggleBtn:SetPoint("LEFT", header, "LEFT", SECTION_HEADER_PADDING, 0)
@@ -57,20 +54,17 @@ QuestList.CreateSectionHeader = function(sectionName, isCollapsed)
     header.toggleBtn.text:SetJustifyH("CENTER")
     header.toggleBtn.text:SetTextColor(0.8, 0.8, 0.8)
     
-    -- Получаем текущий шрифт и увеличиваем его размер
     local font, size, flags = header.toggleBtn.text:GetFont()
-    header.toggleBtn.text:SetFont(font, size * 1.50, "") -- Убираем обводку
+    header.toggleBtn.text:SetFont(font, size * 1.50, "")
     
     header.toggleBtn.text:SetPoint("CENTER", header.toggleBtn, "CENTER", -6, 0)
     
-    -- Текст заголовка (размер как у квестов)
     header.text = header:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     header.text:SetJustifyH("LEFT")
-    header.text:SetTextColor(0.8, 0.8, 0.8) -- светлосерый
+    header.text:SetTextColor(0.8, 0.8, 0.8)
     header.text:SetPoint("LEFT", header.toggleBtn, "RIGHT", -8, 0)
     header.text:SetPoint("RIGHT", header, "RIGHT", -SECTION_HEADER_PADDING, 0)
     
-    -- Обработчики событий для заголовка
     header:SetScript("OnClick", function(self)
         QuestList.ToggleSection(self.sectionName)
     end)
@@ -84,14 +78,13 @@ QuestList.CreateSectionHeader = function(sectionName, isCollapsed)
     end)
     
     header:SetScript("OnEnter", function(self)
-        self.text:SetTextColor(1, 1, 1) -- подстветка при наведении
+        self.text:SetTextColor(1, 1, 1)
     end)
     
     header:SetScript("OnLeave", function(self)
-        self.text:SetTextColor(0.8, 0.8, 0.8) -- возврат к светлосерому
+        self.text:SetTextColor(0.8, 0.8, 0.8)
     end)
     
-    -- Обработчики событий для кнопки сворачивания
     header.toggleBtn:SetScript("OnClick", function(self, button)
         QuestList.ToggleSection(self:GetParent().sectionName)
     end)
@@ -99,7 +92,6 @@ QuestList.CreateSectionHeader = function(sectionName, isCollapsed)
     return header
 end
 
--- Функция для настройки заголовка раздела
 QuestList.SetupSectionHeader = function(header, sectionName, isCollapsed, yOffset)
     header.sectionName = sectionName
     header:SetPoint("TOPLEFT", leftContent, "TOPLEFT", 0, yOffset)
@@ -118,17 +110,15 @@ QuestList.SetupSectionHeader = function(header, sectionName, isCollapsed, yOffse
     header:Show()
 end
 
--- Функция для переключения состояния раздела
 QuestList.ToggleSection = function(sectionName)
     collapsedSections[sectionName] = not collapsedSections[sectionName]
     QuestList.BuildQuestList()
-    -- Обновляем количество квестов после сворачивания/разворачивания
     if overlay and overlay.UpdateQuestCountText then
         overlay.UpdateQuestCountText()
     end
 end
 
--- Функция для создания кнопки квеста
+-- Quest button creation
 QuestList.CreateQuestButton = function(index, qID, data)
     local btn = CreateFrame("Button", nil, leftContent)
     
@@ -136,17 +126,15 @@ QuestList.CreateQuestButton = function(index, qID, data)
     btn.text:SetJustifyH("LEFT")
     btn.text:SetTextColor(1, 1, 1)
 
-    -- Начальные координаты для текста (будут изменяться в зависимости от наличия метки)
     btn.text:SetPoint("TOPLEFT", btn, "TOPLEFT", BUTTON_TEXT_PADDING_X + 4, BUTTON_TEXT_PADDING_Y)
     btn.text:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -BUTTON_TEXT_PADDING_X, BUTTON_TEXT_PADDING_Y)
 
     btn.text.xOffset = BUTTON_TEXT_PADDING_X + 4
     btn.text.yOffset = BUTTON_TEXT_PADDING_Y
 
-    -- Добавляем текст для метки типа квеста в правой части
     btn.typeText = btn:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     btn.typeText:SetJustifyH("RIGHT")
-    btn.typeText:SetTextColor(0.8, 0.8, 0.8) -- Светло-серый цвет для метки
+    btn.typeText:SetTextColor(0.8, 0.8, 0.8)
     btn.typeText:SetPoint("TOPRIGHT", btn, "TOPRIGHT", -BUTTON_TEXT_PADDING_X, BUTTON_TEXT_PADDING_Y)
     btn.typeText:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -BUTTON_TEXT_PADDING_X, BUTTON_TEXT_PADDING_Y)
 
@@ -154,13 +142,13 @@ QuestList.CreateQuestButton = function(index, qID, data)
     btn.selTexture:SetAllPoints(btn)
     btn.selTexture:SetTexture("Interface\\Buttons\\WHITE8x8")
     btn.selTexture:SetBlendMode("ADD")
-    btn.selTexture:SetVertexColor(1, 1, 1, 0.3) -- Белый цвет с прозрачностью
+    btn.selTexture:SetVertexColor(1, 1, 1, 0.3)
     btn.selTexture:Hide()
     
     return btn
 end
 
--- Функция для настройки кнопки квеста
+-- Quest button setup
 QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
     btn.questID = qID
     btn:SetHeight(BUTTON_HEIGHT)
@@ -172,22 +160,23 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
     local level = data.level or "??"
     local questType = data.questType
     
-    -- Формируем метку типа квеста на основе questType
+    -- Quest type label
     local typeLabel = ""
-    local typeColor = {0.8, 0.8, 0.8} -- По умолчанию светло-серый
+    local typeColor = {0.8, 0.8, 0.8}
     if questType then
-        if questType:lower():find("сюжет") or questType:lower():find("story") then
-            typeLabel = "(Сюжетный)"
+        local qtLower = questType:lower()
+        if qtLower:find(L["PATTERN_STORY"]:lower()) or qtLower:find("story") or qtLower:find("сюжет") then
+            typeLabel = L["QUEST_TYPE_STORY"]
             typeColor = {1, 0, 0}
-        elseif questType:lower():find("групп") or questType:lower():find("group") then
-            typeLabel = "(Групповой)"
-            typeColor = {0.60, 0.60, 1} -- Голубовато-фиолетовый цвет для групповых квестов
-        elseif questType:lower():find("подземель") or questType:lower():find("dungeon") then
-            typeLabel = "(Подземелье)"
-            typeColor = {0.2, 0.8, 0.6} -- Зеленовато-бирюзовый цвет для подземелий
-        elseif questType:lower():find("рей") or questType:lower():find("dungeon") then
-            typeLabel = "(Рейд)"
-            typeColor = {1, 0.50, 0} 
+        elseif qtLower:find("групп") or qtLower:find("group") then
+            typeLabel = L["QUEST_TYPE_GROUP"]
+            typeColor = {0.60, 0.60, 1}
+        elseif qtLower:find(L["PATTERN_DUNGEON"]:lower()) or qtLower:find("dungeon") or qtLower:find("подземель") then
+            typeLabel = L["QUEST_TYPE_DUNGEON"]
+            typeColor = {0.2, 0.8, 0.6}
+        elseif qtLower:find(L["PATTERN_RAID"]:lower()) or qtLower:find("raid") or qtLower:find("рей") then
+            typeLabel = L["QUEST_TYPE_RAID"]
+            typeColor = {1, 0.50, 0}
         end
     end
     
@@ -198,12 +187,10 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
         color = { r = 1, g = 0, b = 0 }
     end
     
-    -- Сохраняем цвета для использования в обработчиках событий
     btn.normalTextColor = {r = color.r, g = color.g, b = color.b}
     btn.normalTypeColor = {r = typeColor[1], g = typeColor[2], b = typeColor[3]}
     btn.difficultyColor = {r = color.r, g = color.g, b = color.b}
     
-    -- Устанавливаем основной текст (название квеста)
     local displayLeft
     if QuestList.GetSortType and QuestList.GetSortType() == "id" then
         displayLeft = tostring(qID)
@@ -213,17 +200,13 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
     btn.text:SetTextColor(color.r, color.g, color.b)
     btn.text:SetText(string.format("[%s] %s", displayLeft, title))
     
-    -- Устанавливаем метку типа в правой части
     btn.typeText:SetText(typeLabel)
     btn.typeText:SetTextColor(typeColor[1], typeColor[2], typeColor[3])
     
-    -- Настраиваем позиционирование текста в зависимости от наличия метки
     if typeLabel ~= "" then
-        -- Если есть метка, сокращаем область текста квеста
-        btn.text:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -95, BUTTON_TEXT_PADDING_Y) -- Оставляем 95 пикселей для метки
+        btn.text:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -95, BUTTON_TEXT_PADDING_Y)
         btn.text.hasTypeLabel = true
     else
-        -- Если метки нет, текст занимает всю ширину
         btn.text:SetPoint("BOTTOMRIGHT", btn, "BOTTOMRIGHT", -BUTTON_TEXT_PADDING_X, BUTTON_TEXT_PADDING_Y)
         btn.text.hasTypeLabel = false
     end
@@ -236,7 +219,6 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
             self.text:SetPoint("TOPLEFT", self, "TOPLEFT", self.text.xOffset + 2, self.text.yOffset - 2)
             self.text:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.text.xOffset + 2, self.text.yOffset - 2)
         end
-        -- Метка типа не сдвигается при нажатии
     end)
 
     btn:SetScript("OnMouseUp", function(self)
@@ -247,17 +229,14 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
             self.text:SetPoint("TOPLEFT", self, "TOPLEFT", self.text.xOffset, self.text.yOffset)
             self.text:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.text.xOffset, self.text.yOffset)
         end
-        -- Метка типа не сдвигается при нажатии
     end)
 
     btn:SetScript("OnClick", function(self)
         QuestDetails.HighlightQuestButton(self)
         QuestDetails.ShowQuestDetails(self.questID)
-        -- Если мышь наведена на кнопку, делаем метку типа белой
         if self:IsMouseOver() then
             self.typeText:SetTextColor(1, 1, 1)
         end
-        -- Сброс только позиции скроллбара правого окна
         if _G.QuestDetails and _G.QuestDetails.rightScrollFrame and _G.QuestDetails.rightScrollbar then
             _G.QuestDetails.rightScrollFrame:SetVerticalScroll(0)
             _G.QuestDetails.rightScrollbar:SetValue(0)
@@ -268,18 +247,15 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
     end)
 
     btn:SetScript("OnEnter", function(self)
-        -- При наведении: только текст белый, метка типа тоже белая
         self.text:SetTextColor(1, 1, 1)
         self.typeText:SetTextColor(1, 1, 1)
     end)
 
     btn:SetScript("OnLeave", function(self)
-        -- При уходе мыши: возвращаем нормальные цвета только если квест не выбран
         if _G.selectedButton ~= self then
             self.text:SetTextColor(self.normalTextColor.r, self.normalTextColor.g, self.normalTextColor.b)
             self.typeText:SetTextColor(self.normalTypeColor.r, self.normalTypeColor.g, self.normalTypeColor.b)
         else
-            -- Если квест выбран, основной текст остается белым, метка типа возвращается к нормальному цвету
             self.text:SetTextColor(1, 1, 1)
             self.typeText:SetTextColor(self.normalTypeColor.r, self.normalTypeColor.g, self.normalTypeColor.b)
         end
@@ -288,11 +264,10 @@ QuestList.SetupQuestButton = function(btn, index, qID, data, yOffset)
     btn:Show()
 end
 
--- Основная функция для построения списка квестов
+-- Main quest list builder
 QuestList.BuildQuestList = function()
     if not leftContent then return end
 
-    -- Очищаем все существующие элементы
     if leftContent.elements then
         for _, element in ipairs(leftContent.elements) do
             element:Hide()
@@ -335,14 +310,14 @@ QuestList.BuildQuestList = function()
     
     local sections = {}
     if showWithoutGroups then
-        sections["Все квесты"] = {}
+        sections[L["ALL_QUESTS"]] = {}
         for qID, data in pairs(questDB) do
-            table.insert(sections["Все квесты"], {id = qID, data = data})
+            table.insert(sections[L["ALL_QUESTS"]], {id = qID, data = data})
         end
     else
         local locationQuests = {}
         for qID, data in pairs(questDB) do
-            local sectionName = data.questGroup or data.mainZone or "Неизвестная локация"
+            local sectionName = data.questGroup or data.mainZone or L["UNKNOWN_LOCATION"]
             if not locationQuests[sectionName] then
                 locationQuests[sectionName] = {}
             end
@@ -381,12 +356,12 @@ QuestList.BuildQuestList = function()
                 valueA = dataA.timeAccepted or ""
                 valueB = dataB.timeAccepted or ""
             elseif sortType == "completion" then
-                local currentPlayerEnabled = true
+                local cpEnabled = true
                 if _G.MQSH_QuestOverlay and _G.MQSH_QuestOverlay.currentPlayerCheck then
-                    currentPlayerEnabled = _G.MQSH_QuestOverlay.currentPlayerCheck:GetChecked()
+                    cpEnabled = _G.MQSH_QuestOverlay.currentPlayerCheck:GetChecked()
                 end
                 
-                if currentPlayerEnabled then
+                if cpEnabled then
                     valueA = dataA.timeCompleted or ""
                     valueB = dataB.timeCompleted or ""
                 else
@@ -399,17 +374,9 @@ QuestList.BuildQuestList = function()
             end
             
             if sortOrder == "asc" then
-                if sortType == "title" then
-                    return valueA < valueB
-                else
-                    return valueA < valueB
-                end
+                return valueA < valueB
             else
-                if sortType == "title" then
-                    return valueA > valueB
-                else
-                    return valueA > valueB
-                end
+                return valueA > valueB
             end
         end)
     end
@@ -476,7 +443,7 @@ QuestList.BuildQuestList = function()
     end
 end
 
--- Функция для создания левого окна
+-- Left window creation
 QuestList.CreateLeftWindow = function(overlay, windowWidth, windowHeight, leftWindowX, elementY, LEFT_WINDOW_PADDING_X, LEFT_WINDOW_PADDING_Y, WINDOW_SPACING, BUTTON_HEIGHT, BUTTON_SPACING)
     local leftWindow = CreateFrame("Frame", nil, overlay)
     leftWindow:SetPoint("TOPLEFT", overlay, "TOPLEFT", leftWindowX, elementY)
@@ -489,4 +456,4 @@ QuestList.CreateLeftWindow = function(overlay, windowWidth, windowHeight, leftWi
     return leftWindow, leftScrollFrame, leftContent, leftScrollbar
 end
 
-_G.QuestList = QuestList 
+_G.QuestList = QuestList

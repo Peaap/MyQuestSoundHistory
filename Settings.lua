@@ -1,4 +1,5 @@
 local addonName = "MyQuestSoundHistory"
+local L = _G.MQSH_L
 
 if not MQSH_Config then
     MQSH_Config = {
@@ -106,7 +107,7 @@ local function CreatePlayButton(parent, anchorFrame, configKey, point, relativeT
     return button
 end
 
--- Главная панель
+-- Main panel
 local function CreateMainSettingsPanel()
     local panel = CreateFrame("Frame")
     panel.name = "MyQuestSoundHistory"
@@ -116,13 +117,13 @@ local function CreateMainSettingsPanel()
     title:SetPoint("TOPLEFT", 20, -20)
     title:SetText("MyQuestSoundHistory")
 
-    local soundAnouncerCheck = CreateCheckbox(panel, "Модуль звукового анонсера квестов", "enableSoundAnouncer", "TOPLEFT", title, "BOTTOMLEFT", 0, -20)
-    local historyCheck = CreateCheckbox(panel, "Модуль истории квестов", "enableHistory", "TOPLEFT", soundAnouncerCheck, "BOTTOMLEFT", 0, -10)
+    local soundAnouncerCheck = CreateCheckbox(panel, L["SOUND_ANNOUNCER_MODULE"], "enableSoundAnouncer", "TOPLEFT", title, "BOTTOMLEFT", 0, -20)
+    local historyCheck = CreateCheckbox(panel, L["HISTORY_MODULE"], "enableHistory", "TOPLEFT", soundAnouncerCheck, "BOTTOMLEFT", 0, -10)
 
     InterfaceOptions_AddCategory(panel)
 end
 
--- Панель History (заглушка)
+-- History panel (placeholder)
 local function CreateHistorySettingsPanel()
     local panel = CreateFrame("Frame")
     panel.name = "History"
@@ -135,12 +136,12 @@ local function CreateHistorySettingsPanel()
 
     local desc = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     desc:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -20)
-    desc:SetText("Здесь будут настройки истории квестов.")
+    desc:SetText(L["HISTORY_SETTINGS_DESC"])
 
     InterfaceOptions_AddCategory(panel)
 end
 
--- Панель Sound Anouncer
+-- Sound Anouncer panel
 local function CreateSoundAnouncerSettingsPanel()
     local panel = CreateFrame("Frame")
     panel.name = "Sound Anouncer"
@@ -151,16 +152,16 @@ local function CreateSoundAnouncerSettingsPanel()
     title:SetPoint("TOPLEFT", 20, -20)
     title:SetText("Sound Anouncer Settings")
 
-    local workCheck = CreateCheckbox(panel, "Звук завершения квеста", "enableWorkComplete", "TOPLEFT", title, "BOTTOMLEFT", 0, -20)
-    local workDropdown = CreateDropdown(panel, "workCompleteSound", workCheck, "Завершения квеста", -15, -3, "TOPLEFT", "BOTTOMLEFT")
+    local workCheck = CreateCheckbox(panel, L["SOUND_COMPLETE"], "enableWorkComplete", "TOPLEFT", title, "BOTTOMLEFT", 0, -20)
+    local workDropdown = CreateDropdown(panel, "workCompleteSound", workCheck, L["SOUND_COMPLETE"], -15, -3, "TOPLEFT", "BOTTOMLEFT")
     local playWork = CreatePlayButton(panel, workDropdown, "workCompleteSound", "LEFT", workDropdown, "RIGHT", -4, 2)
 
-    local singleCheck = CreateCheckbox(panel, "Звук завершения этапа", "enableSingleComplete", "TOPLEFT", workCheck, "BOTTOMLEFT", 0, -45)
-    local singleDropdown = CreateDropdown(panel, "singleCompleteSound", singleCheck, "Завершения этапа", -15, -3, "TOPLEFT", "BOTTOMLEFT")
+    local singleCheck = CreateCheckbox(panel, L["SOUND_STAGE_COMPLETE"], "enableSingleComplete", "TOPLEFT", workCheck, "BOTTOMLEFT", 0, -45)
+    local singleDropdown = CreateDropdown(panel, "singleCompleteSound", singleCheck, L["SOUND_STAGE_COMPLETE"], -15, -3, "TOPLEFT", "BOTTOMLEFT")
     local playSingle = CreatePlayButton(panel, singleDropdown, "singleCompleteSound", "LEFT", singleDropdown, "RIGHT", -4, 2)
 
-    local progressCheck = CreateCheckbox(panel, "Звук прогресса квеста", "enableProgressSound", "TOPLEFT", singleCheck, "BOTTOMLEFT", 0, -45)
-    local progressDropdown = CreateDropdown(panel, "progressSound", progressCheck, "Прогресс квеста", -15, -3, "TOPLEFT", "BOTTOMLEFT")
+    local progressCheck = CreateCheckbox(panel, L["SOUND_PROGRESS"], "enableProgressSound", "TOPLEFT", singleCheck, "BOTTOMLEFT", 0, -45)
+    local progressDropdown = CreateDropdown(panel, "progressSound", progressCheck, L["SOUND_PROGRESS"], -15, -3, "TOPLEFT", "BOTTOMLEFT")
     local playProgress = CreatePlayButton(panel, progressDropdown, "progressSound", "LEFT", progressDropdown, "RIGHT", -4, 2)
 
     InterfaceOptions_AddCategory(panel)

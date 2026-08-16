@@ -1,3 +1,5 @@
+local L = _G.MQSH_L
+
 if not MQSH_QuestDB then
     MQSH_QuestDB = {}
 end
@@ -6,7 +8,7 @@ if not MQSH_Char_HistoryDB then
     MQSH_Char_HistoryDB = {}
 end
 
--- Функция для безопасного выполнения действий с выбранным квестом
+-- Safe wrapper for quest log selection
 local function WithQuestLogSelection(index, func)
     local prev = GetQuestLogSelection()
     SelectQuestLogEntry(index)
@@ -16,13 +18,13 @@ local function WithQuestLogSelection(index, func)
     end
 end
 
--- Функция для очистки строки от лишних пробелов
+-- Clean whitespace from location strings
 local function CleanLocationString(str)
     if not str then return nil end
     return str:gsub("^%s*(.-)%s*$", "%1"):gsub("%s+", " ")
 end
 
--- Функция для получения ID и данных о квесте
+-- Get quest ID and data from quest log
 local function GetQuestIDAndData(questLogIndex, currentNPC)
     local questID, questData = nil, nil
 
@@ -46,12 +48,12 @@ local function GetQuestIDAndData(questLogIndex, currentNPC)
                 end
             end
             
-            if questGroup and (questGroup:lower():find("сюжет") or questGroup:lower():find("story")) then
-                questType = "(Сюжетный)"
+            if questGroup and (questGroup:lower():find(L["PATTERN_STORY"]) or questGroup:lower():find("story")) then
+                questType = L["QUEST_TYPE_STORY"]
                 questGroup = nil
             end
 
-            if questGroup and not questGroup:lower():find("особ") and questType and not questType:lower():find("рей") and not questType:lower():find("подземель") then
+            if questGroup and not questGroup:lower():find(L["PATTERN_SPECIAL"]) and questType and not questType:lower():find(L["PATTERN_RAID"]) and not questType:lower():find(L["PATTERN_DUNGEON"]) then
                 questGroup = nil
             end
 
@@ -71,10 +73,10 @@ local function GetQuestIDAndData(questLogIndex, currentNPC)
             if currentNPC and currentNPC ~= "" then
                 npcName = currentNPC
             else
-                npcName = "Неизвестный NPC"
+                npcName = L["UNKNOWN_NPC"]
             end
 
-            -- Цели
+            -- Objectives
             local objectives = {}
             local numObjectives = GetNumQuestLeaderBoards()
             if numObjectives and numObjectives > 0 then
@@ -86,7 +88,7 @@ local function GetQuestIDAndData(questLogIndex, currentNPC)
                 end
             end
 
-            -- Награды
+            -- Rewards
             local rewards = {
                 items   = {},
                 choices = {},
@@ -153,7 +155,6 @@ local function QuestDataBaseController_OnLoad()
         if GetQuestID then
             questID = GetQuestID()
             if questID and questID ~= 0 then
-
                 questData = MQSH_QuestDB[questID]
             end
         end
@@ -178,7 +179,7 @@ local function QuestDataBaseController_OnLoad()
             end
             local completionCoordinates = { x = x, y = y }
             
-            local completionNPC = currentNPC or "Неизвестный NPC"
+            local completionNPC = currentNPC or L["UNKNOWN_NPC"]
             local historyData = {
                 timeCompleted = date("%d.%m.%y %H:%M:%S"),
                 completionNPC = completionNPC,

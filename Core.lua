@@ -1,4 +1,5 @@
 local addonName = "MyQuestSoundHistory"
+local L = _G.MQSH_L
 local f = CreateFrame("Frame")
 
 f:RegisterEvent("ADDON_LOADED")
@@ -14,15 +15,15 @@ f:SetScript("OnEvent", function(self, event, arg1, arg2)
         SlashCmdList["MYQUESTSOUNDHISTORYCLEAR"] = function()
             if MQSH_QuestDB then
                 MQSH_QuestDB = {}
-                print("MQSH: База данных квестов полностью очищена")
+                print(L["QUEST_DB_CLEARED"])
             else
-                print("MQSH: База данных квестов пуста")
+                print(L["QUEST_DB_EMPTY"])
             end
             if MQSH_Char_HistoryDB then
                 MQSH_Char_HistoryDB = {}
-                print("MQSH: История квестов персонажа очищена")
+                print(L["CHAR_HISTORY_CLEARED"])
             else
-                print("MQSH: История квестов персонажа пуста")
+                print(L["CHAR_HISTORY_EMPTY"])
             end
         end
 

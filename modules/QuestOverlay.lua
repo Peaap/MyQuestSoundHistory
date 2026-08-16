@@ -1,8 +1,9 @@
+local L = _G.MQSH_L
 local uiCreated = false
 local QuestDetails = _G.QuestDetails
 local QuestList = _G.QuestList
 
--- Глобальная функция для обновления количества квестов
+-- Global function to update quest count text
 local function UpdateQuestCountText()
     local count = 0
     
@@ -21,35 +22,31 @@ local function UpdateQuestCountText()
     end
     
     if _G.MQSH_QuestOverlay and _G.MQSH_QuestOverlay.questCountFS then
-        _G.MQSH_QuestOverlay.questCountFS:SetText("Квестов: " .. count)
+        _G.MQSH_QuestOverlay.questCountFS:SetText(L["QUESTS_COUNT"] .. count)
     end
 end
 
--- Делаем функцию доступной глобально
 _G.UpdateQuestCountText = UpdateQuestCountText
 
--- Настройки отступов
+-- Layout constants
 local OVERLAY_PADDING_LEFT_RIGHT = 7
 local OVERLAY_PADDING_TOP = 45
 local OVERLAY_PADDING_BOTTOM = 35
 local WINDOW_SPACING = 4
 
--- Настройки окон
 local TITLE_TOP_OFFSET = 5
 
--- Отступы контента внутри окон
 local LEFT_WINDOW_PADDING_X = 6
 local LEFT_WINDOW_PADDING_Y = 3
 local RIGHT_WINDOW_PADDING_X = 5
 local RIGHT_WINDOW_PADDING_Y = 7
 
--- Настройки кнопок
 local BUTTON_HEIGHT = 16
 local BUTTON_TEXT_PADDING_X = 5
 local BUTTON_TEXT_PADDING_Y = 0
 local BUTTON_SPACING = 0
 
--- Переменные интерфейса
+-- UI variables
 local overlay
 local leftScrollFrame, leftContent
 local rightScrollFrame, rightContent, detailsFS, detailsTitle
@@ -66,7 +63,7 @@ local scrollPairs = {}
 
 local sortDropdown, orderBtn
 
--- Функция для создания выпадающего окна сортировки
+-- Sort dropdown creation
 local function CreateSortDropdown(parent)
     local dropdown = CreateFrame("Frame", "MQSH_SortDropdown", parent, "UIDropDownMenuTemplate")
     
@@ -95,13 +92,13 @@ local function CreateSortDropdown(parent)
         local sortOrder = QuestList.GetSortOrder()
         if level == 1 then
             local info = UIDropDownMenu_CreateInfo()
-            info.text = "Сортировка"
+            info.text = L["SORT_TITLE"]
             info.isTitle = true
             info.notCheckable = true
             UIDropDownMenu_AddButton(info, level)
 
             info = UIDropDownMenu_CreateInfo()
-            info.text = "По уровню"
+            info.text = L["SORT_BY_LEVEL"]
             info.value = "level"
             info.checked = (sortType == "level")
             info.func = function(self)
@@ -113,7 +110,7 @@ local function CreateSortDropdown(parent)
             UIDropDownMenu_AddButton(info, level)
 
             info = UIDropDownMenu_CreateInfo()
-            info.text = "По названию"
+            info.text = L["SORT_BY_NAME"]
             info.value = "title"
             info.checked = (sortType == "title")
             info.func = function(self)
@@ -125,7 +122,7 @@ local function CreateSortDropdown(parent)
             UIDropDownMenu_AddButton(info, level)
 
             info = UIDropDownMenu_CreateInfo()
-            info.text = "По ID"
+            info.text = L["SORT_BY_ID"]
             info.value = "id"
             info.checked = (sortType == "id")
             info.func = function(self)
@@ -137,7 +134,7 @@ local function CreateSortDropdown(parent)
             UIDropDownMenu_AddButton(info, level)
 
             info = UIDropDownMenu_CreateInfo()
-            info.text = "По дате принятия"
+            info.text = L["SORT_BY_ACCEPT_DATE"]
             info.value = "date"
             info.checked = (sortType == "date")
             info.func = function(self)
@@ -149,7 +146,7 @@ local function CreateSortDropdown(parent)
             UIDropDownMenu_AddButton(info, level)
 
             info = UIDropDownMenu_CreateInfo()
-            info.text = "По дате завершения"
+            info.text = L["SORT_BY_COMPLETION_DATE"]
             info.value = "completion"
             info.checked = (sortType == "completion")
             info.func = function(self)
@@ -174,7 +171,7 @@ local function TryCreateQuestUI()
 
     local DataBtn = CreateFrame("Button", "MQSH_ShowListButton", QuestLogFrame, "UIPanelButtonTemplate")
     DataBtn:SetSize(80, 22)
-    DataBtn:SetText("История")
+    DataBtn:SetText(L["QUEST_HISTORY"])
     DataBtn:SetPoint("TOPRIGHT", QuestLogFrame, "TOPRIGHT", -150, -33)
 
     overlay = CreateFrame("Frame", "MQSH_QuestOverlay", QuestLogFrame)
@@ -192,7 +189,6 @@ local function TryCreateQuestUI()
     closeBtn:SetScript("OnClick", function()
         overlay:Hide()
         ScrollBarUtils.ResetScrollBars(scrollPairs)
-        -- Сбрасываем параметры сортировки
         QuestList.SetSortParams(QuestList.GetSortType(), QuestList.GetSortOrder())
     end)
 
@@ -219,7 +215,7 @@ local function TryCreateQuestUI()
     )
 
     local rightTitle = ScrollBarUtils.CreateFS(overlay, "GameFontHighlight")
-    rightTitle:SetText("|cffFFD100История квестов|r")
+    rightTitle:SetText("|cffFFD100" .. L["QUEST_HISTORY_TITLE"] .. "|r")
     rightTitle:ClearAllPoints()
     rightTitle:SetPoint("TOP", overlay, "TOP", 0, -2)
 
@@ -351,7 +347,7 @@ local function TryCreateQuestUI()
     showWithoutGroupsCheck:SetPoint("LEFT", showWithoutGroupsButton, "LEFT", 0, 0)
     showWithoutGroupsCheck.text = showWithoutGroupsCheck:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     showWithoutGroupsCheck.text:SetPoint("LEFT", showWithoutGroupsCheck, "RIGHT", 5, 0)
-    showWithoutGroupsCheck.text:SetText("Без группировки")
+    showWithoutGroupsCheck.text:SetText(L["WITHOUT_GROUPS"])
     showWithoutGroupsCheck:SetChecked(false)
     
     showWithoutGroupsButton:SetScript("OnClick", function()
@@ -376,7 +372,7 @@ local function TryCreateQuestUI()
     currentPlayerCheck:SetPoint("LEFT", currentPlayerButton, "LEFT", 0, 0)
     currentPlayerCheck.text = currentPlayerCheck:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     currentPlayerCheck.text:SetPoint("LEFT", currentPlayerCheck, "RIGHT", 5, 0)
-    currentPlayerCheck.text:SetText("Текущий персонаж")
+    currentPlayerCheck.text:SetText(L["CURRENT_PLAYER"])
     currentPlayerCheck:SetChecked(true)
     
     overlay.currentPlayerCheck = currentPlayerCheck
@@ -406,4 +402,4 @@ loader:SetScript("OnEvent", function(_, event, arg1)
     end
 end)
 
-_G.QuestOverlay_TryInit = TryCreateQuestUI 
+_G.QuestOverlay_TryInit = TryCreateQuestUI
